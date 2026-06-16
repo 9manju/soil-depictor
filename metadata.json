@@ -1,0 +1,6 @@
+{
+  "name": "Soil Depictor",
+  "description": "Know Your Soil, Grow the Right Crop - A modern interactive full-stack helper to analyze soil health and select suitable crops.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
