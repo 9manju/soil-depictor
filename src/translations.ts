@@ -55,6 +55,19 @@ export interface TranslationDict {
   cropSuitabilityTrend: string;
   CropSuitabilityTrend: string;
   recommendationsBasedOn: string;
+  loginTitle: string;
+  loginSubtitle: string;
+  farmerNameLabel: string;
+  farmerNamePlaceholder: string;
+  mobileLabel: string;
+  mobilePlaceholder: string;
+  pinLabel: string;
+  pinPlaceholder: string;
+  loginBtn: string;
+  guestLoginBtn: string;
+  logoutBtn: string;
+  anyUserNotice: string;
+  farmerProfile: string;
   districtsList: Record<string, string>;
   mandalsList: Record<string, string>;
   cropsList: Record<string, string>;
@@ -120,6 +133,19 @@ export const translations: Record<Language, TranslationDict> = {
     cropSuitabilityTrend: "Crop Suitability Trend",
     CropSuitabilityTrend: "Crop Suitability Trend",
     recommendationsBasedOn: "Crop recommendations based on soil suitability percentage",
+    loginTitle: "Farmer Registration & Login Profile",
+    loginSubtitle: "Sign in to your customized Soil Depictor account. Every user has pre-approved access.",
+    farmerNameLabel: "Farmer Name / ID",
+    farmerNamePlaceholder: "Enter Your Name (e.g., Rama Rao)",
+    mobileLabel: "Mobile Number",
+    mobilePlaceholder: "Enter 10-digit number (e.g., 9876543210)",
+    pinLabel: "4-Digit Security PIN",
+    pinPlaceholder: "Enter any 4 digits (e.g., 1234)",
+    loginBtn: "Authorize & Sign In",
+    guestLoginBtn: "Continue as Guest Farmer",
+    logoutBtn: "Sign Out",
+    anyUserNotice: "Pre-Authorized Gateway: To ensure a seamless experience for every farmer, any name and PIN is validated instantly.",
+    farmerProfile: "Farmer Profile",
     districtsList: {
       "Anakapalli": "Anakapalli",
       "Anantapur": "Anantapur",
@@ -253,6 +279,19 @@ export const translations: Record<Language, TranslationDict> = {
     cropSuitabilityTrend: "పంట అనుకూలత సూచిక సరళి",
     CropSuitabilityTrend: "పంట అనుకూలత సూచిక సరళి",
     recommendationsBasedOn: "నేల అనుకూలత శాతం ఆధారంగా పంటల సిఫార్సులు",
+    loginTitle: "రైతు నమోదు మరియు లాగిన్ ప్రొఫైల్",
+    loginSubtitle: "మీ వ్యక్తిగతీకరించిన సాయిల్ డిపిక్టర్ ఖాతాకు సైన్ ఇన్ చేయండి. ప్రతి వినియోగదారునికి ముందే ఆమోదించబడిన ప్రవేశం ఉంది.",
+    farmerNameLabel: "రైతు పేరు / ఐడి",
+    farmerNamePlaceholder: "మీ పేరు నమోదు చేయండి (ఉదా: రామారావు)",
+    mobileLabel: "మొబైల్ సంఖ్య",
+    mobilePlaceholder: "10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి (ఉదా: 9876543210)",
+    pinLabel: "4-అంకెల సెక్యూరిటీ పిన్ (PIN)",
+    pinPlaceholder: "ఏదైనా 4 అంకెలు నమోదు చేయండి (ఉదా: 1234)",
+    loginBtn: "ధృవీకరించండి & ప్రవేశించండి",
+    guestLoginBtn: "అతిథి రైతుగా కొనసాగండి",
+    logoutBtn: "సైన్ అవుట్",
+    anyUserNotice: "ముందే అధికారం పొందిన గేట్‌వే: ప్రతి రైతుకు సులభమైన అనుభవాన్ని అందించడానికి, ఏ పేరు మరియు పిన్ అయినా తక్షణమే ధృవీకరించబడుతుంది.",
+    farmerProfile: "రైతు ప్రొఫైల్",
     districtsList: {
       "Anakapalli": "అనకాపల్లి",
       "Anantapur": "అనంతపురం",
@@ -386,6 +425,19 @@ export const translations: Record<Language, TranslationDict> = {
     cropSuitabilityTrend: "फसल अनुकूलता रुझान",
     CropSuitabilityTrend: "फसल अनुकूलता रुझान",
     recommendationsBasedOn: "मिट्टी की उपयुक्तता प्रतिशत के आधार पर फसलों की सिफारिशें",
+    loginTitle: "किसान पंजीकरण और लॉगिन प्रोफ़ाइल",
+    loginSubtitle: "अपने व्यक्तिगत सॉइल डिपिक्टर खाते में साइन इन करें। प्रत्येक उपयोगकर्ता के पास पूर्व-स्वीकृत प्रवेश अधिकार है।",
+    farmerNameLabel: "किसान का नाम / आईडी",
+    farmerNamePlaceholder: "अपना नाम दर्ज करें (जैसे, राम राव)",
+    mobileLabel: "मोबाइल नंबर",
+    mobilePlaceholder: "10 अंकों का मोबाइल नंबर दर्ज करें (जैसे, 9876543210)",
+    pinLabel: "4-अंकीय सुरक्षा पिन",
+    pinPlaceholder: "कोई भी 4 अंक दर्ज करें (जैसे, 1234)",
+    loginBtn: "सत्यापित करें और प्रवेश करें",
+    guestLoginBtn: "अतिथि किसान के रूप में आगे बढ़ें",
+    logoutBtn: "साइन आउट",
+    anyUserNotice: "पूर्व-अधिकृत गेटवे: प्रत्येक किसान के लिए एक सहज अनुभव सुनिश्चित करने के लिए, किसी भी नाम और पिन को तुरंत सत्यापित किया जाता है।",
+    farmerProfile: "किसान प्रोफ़ाइल",
     districtsList: {
       "Anakapalli": "अनकापल्ली",
       "Anantapur": "अनंतपुर",

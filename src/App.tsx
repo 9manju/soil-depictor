@@ -57,7 +57,25 @@ interface CropRec {
 
 export default function App() {
   const [lang, setLang] = useState<Language>("en");
-  const [step, setStep] = useState<number>(0); // 0: Lang, 1: Location, 2: Soil Info, 3: Soil Condition, 4: Analytics, 5: Crop Recommendation
+  
+  // Farmer authentication state
+  const [user, setUser] = useState<{ name: string; mobile: string; pin: string; isLoggedIn: boolean } | null>(() => {
+    try {
+      const saved = localStorage.getItem("soil_depictor_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Login Form States
+  const [loginName, setLoginName] = useState<string>("");
+  const [loginMobile, setLoginMobile] = useState<string>("");
+  const [loginPin, setLoginPin] = useState<string>("");
+  const [loginError, setLoginError] = useState<string>("");
+  const [isLogining, setIsLogining] = useState<boolean>(false);
+
+  const [step, setStep] = useState<number>(0); // 0: Lang, 0.5: Login, 1: Location, 2: Soil Info, 3: Soil Condition, 4: Analytics, 5: Crop Recommendation
 
   // Location State
   const [districts, setDistricts] = useState<string[]>([]);
@@ -266,32 +284,57 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-white/80 p-1 rounded-xl border border-[#dfe7e0] shadow-sm">
-            <Globe className="w-4 h-4 text-[#527055] ml-2" />
-            <button
-              onClick={() => setLang("en")}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
-                lang === "en" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLang("te")}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
-                lang === "te" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
-              }`}
-            >
-              తెలుగు
-            </button>
-            <button
-              onClick={() => setLang("hi")}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
-                lang === "hi" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
-              }`}
-            >
-              हिन्दी
-            </button>
+          <div className="flex items-center gap-3">
+            {user && user.isLoggedIn && (
+              <div className="flex items-center gap-2 bg-emerald-50/90 border border-emerald-200/60 rounded-xl px-2.5 py-1 shadow-sm transition-all animate-fade-in">
+                <div className="w-5 h-5 rounded-full bg-[#4c7c4f] text-white flex items-center justify-center font-black text-[10px] uppercase shrink-0">
+                  {user.name.charAt(0)}
+                </div>
+                <div className="text-left leading-none hidden sm:block">
+                  <span className="text-[8px] text-emerald-800 font-extrabold uppercase block">{t.farmerProfile}</span>
+                  <span className="text-[11px] text-[#1c3822] font-black max-w-[100px] truncate block">{user.name}</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    setUser(null);
+                    localStorage.removeItem("soil_depictor_user");
+                    setStep(0);
+                  }}
+                  className="ml-1 text-[10px] font-black text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100/50 px-1.5 py-1 rounded-md transition-colors cursor-pointer uppercase tracking-wider"
+                  title={t.logoutBtn}
+                >
+                  {t.logoutBtn}
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 bg-white/80 p-1 rounded-xl border border-[#dfe7e0] shadow-sm">
+              <Globe className="w-4 h-4 text-[#527055] ml-2" />
+              <button
+                onClick={() => setLang("en")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  lang === "en" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLang("te")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  lang === "te" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
+                }`}
+              >
+                తెలుగు
+              </button>
+              <button
+                onClick={() => setLang("hi")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  lang === "hi" ? "bg-[#4c7c4f] text-white shadow-sm" : "text-[#527055] hover:bg-gray-100"
+                }`}
+              >
+                हिन्दी
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -299,8 +342,8 @@ export default function App() {
       {/* Main Container */}
       <main id="app-main-content" className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 md:py-10 z-10">
         
-        {/* Step Stepper Indicator - only shown if past initial language select */}
-        {step > 0 && (
+        {/* Step Stepper Indicator - only shown if past initial language select & login */}
+        {step >= 1 && (
           <div id="step-bubbles" className="mb-8 bg-white/70 p-4 rounded-2xl border border-[#e2eae3] shadow-sm backdrop-blur-sm max-w-4xl mx-auto">
             <div className="flex justify-between items-center relative">
               <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-[#d3dfd5] z-0"></div>
@@ -408,12 +451,256 @@ export default function App() {
 
                 <button
                   id="btn-lang-continue"
-                  onClick={() => setStep(1)}
+                  onClick={() => {
+                    if (user && user.isLoggedIn) {
+                      setStep(1);
+                    } else {
+                      setStep(0.5);
+                    }
+                  }}
                   className="w-full bg-gradient-to-r from-[#4c7c4f] to-[#3f6742] hover:from-[#3f6742] hover:to-[#2e4d31] text-white py-4 px-6 rounded-2xl font-bold tracking-wide shadow-lg shadow-[#4c7c4f]/20 transition-all transform active:scale-95 flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <span>{t.continueBtn}</span>
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* ==============================================
+              PAGE 1.5: FARMER LOGIN / REGISTRATION (Step 0.5)
+             ============================================== */}
+          {step === 0.5 && (
+            <div id="step-login" className="max-w-2xl mx-auto w-full animate-fade-in">
+              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-green-900/[0.04] border border-[#e2eae3] backdrop-blur-md relative overflow-hidden">
+                
+                {/* Visual Background Accents */}
+                <div className="absolute -right-24 -top-24 w-60 h-60 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute -left-24 -bottom-24 w-60 h-60 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                {/* Back Button */}
+                <button
+                  onClick={() => setStep(0)}
+                  className="mb-6 flex items-center gap-2 text-sm font-bold text-[#527055] hover:text-[#1c3822] cursor-pointer transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>{t.backBtn}</span>
+                </button>
+
+                {/* Header info */}
+                <div className="flex items-center gap-3.5 mb-6">
+                  <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-[#4c7c4f] rounded-2xl border border-emerald-100">
+                    <Sparkles className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-[#1c3822] tracking-tight">
+                      {t.loginTitle}
+                    </h2>
+                    <p className="text-xs text-[#527055] font-semibold mt-0.5">
+                      {t.loginSubtitle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Banner explaining pre-authorization */}
+                <div className="mb-6 p-4 bg-emerald-50/70 border border-emerald-100 rounded-2xl text-xs text-[#2a4d2e] font-semibold flex items-start gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0"></div>
+                  <p>{t.anyUserNotice}</p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  
+                  {/* Left part: Quick Auto-Fill Profiles */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">
+                      Quick Profile Selection
+                    </h3>
+                    <p className="text-[11px] text-[#527055] font-medium leading-relaxed">
+                      Tap a pre-approved farmer profile to login instantly:
+                    </p>
+                    
+                    <div className="space-y-2.5">
+                      {[
+                        { name: "Rama Rao", mobile: "9848012345", pin: "1234", bio: "👨‍🌾 Anakapalli • Groundnut Specialist" },
+                        { name: "Anitha Devi", mobile: "9490123456", pin: "5678", bio: "👩‍🌾 Bheemunipatnam • Cashew Expert" },
+                        { name: "Satish Kumar", mobile: "8008123456", pin: "9999", bio: "👨‍🌾 Anandapuram • Paddy Cultivator" }
+                      ].map((p, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setLoginName(p.name);
+                            setLoginMobile(p.mobile);
+                            setLoginPin(p.pin);
+                            setLoginError("");
+                          }}
+                          className={`w-full text-left p-3 rounded-xl border transition-all duration-300 flex flex-col hover:border-[#4c7c4f] hover:bg-emerald-50/30 ${
+                            loginName === p.name 
+                              ? "bg-emerald-50/50 border-emerald-500/85 ring-2 ring-emerald-500/10" 
+                              : "bg-white border-gray-200"
+                          }`}
+                        >
+                          <span className="text-xs font-bold text-[#1c3822]">{p.name}</span>
+                          <span className="text-[10px] font-bold text-gray-500 font-mono mt-0.5">{p.bio}</span>
+                          <span className="text-[9px] text-[#527055] font-medium mt-1">Mobile: {p.mobile} • PIN: {p.pin}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right part: Login form */}
+                  <div className="lg:col-span-7 bg-[#f7faf8] border border-[#eff4ef] p-5 rounded-2xl flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <h3 className="text-xs font-black text-[#1c3822] uppercase tracking-wider">
+                        Custom Registration Form
+                      </h3>
+
+                      {/* Username input */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#1c3822] uppercase tracking-wider mb-1.5">
+                          {t.farmerNameLabel} <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={loginName}
+                            onChange={(e) => {
+                              setLoginName(e.target.value);
+                              if (loginError) setLoginError("");
+                            }}
+                            placeholder={t.farmerNamePlaceholder}
+                            className="w-full pl-3 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Mobile input */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#1c3822] uppercase tracking-wider mb-1.5">
+                          {t.mobileLabel}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={loginMobile}
+                            onChange={(e) => {
+                              setLoginMobile(e.target.value.replace(/\D/g, "").slice(0, 10));
+                              if (loginError) setLoginError("");
+                            }}
+                            placeholder={t.mobilePlaceholder}
+                            className="w-full pl-3 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Security PIN input */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#1c3822] uppercase tracking-wider mb-1.5">
+                          {t.pinLabel} <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            maxLength={4}
+                            value={loginPin}
+                            onChange={(e) => {
+                              setLoginPin(e.target.value.replace(/\D/g, ""));
+                              if (loginError) setLoginError("");
+                            }}
+                            placeholder={t.pinPlaceholder}
+                            className="w-full pl-3 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-800 tracking-widest placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Error panel */}
+                      {loginError && (
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold leading-normal">
+                          ⚠️ {loginError}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-6 space-y-2.5">
+                      {/* Standard Login Submit Button */}
+                      <button
+                        id="btn-login-submit"
+                        disabled={isLogining}
+                        onClick={() => {
+                          if (!loginName.trim() || loginName.trim().length < 2) {
+                            setLoginError(lang === "te" ? "దయచేసి కనీసం 2 అక్షరాల రైతు పేరును నమోదు చేయండి." : lang === "hi" ? "कृपया कम से कम 2 अक्षरों का किसान नाम दर्ज करें।" : "Please enter a valid farmer name (at least 2 characters).");
+                            return;
+                          }
+                          if (!loginPin || loginPin.length !== 4) {
+                            setLoginError(lang === "te" ? "దయచేసి 4 అంకెల సెక్యూరిటీ పిన్ నమోదు చేయండి." : lang === "hi" ? "कृपया 4-अंकीय सुरक्षा पिन दर्ज करें।" : "Please enter a valid 4-digit security PIN.");
+                            return;
+                          }
+
+                          setIsLogining(true);
+                          setLoginError("");
+
+                          // Pre-authorized instant delay
+                          setTimeout(() => {
+                            const loggedUser = {
+                              name: loginName.trim(),
+                              mobile: loginMobile,
+                              pin: loginPin,
+                              isLoggedIn: true
+                            };
+                            setUser(loggedUser);
+                            localStorage.setItem("soil_depictor_user", JSON.stringify(loggedUser));
+                            setIsLogining(false);
+                            setStep(1); // Proceed to location search!
+                          }, 800);
+                        }}
+                        className="w-full bg-gradient-to-r from-[#4c7c4f] to-[#3f6742] hover:from-[#3f6742] hover:to-[#2e4d31] disabled:from-[#a0b0a2] disabled:to-[#91a093] text-white py-3.5 px-6 rounded-2xl font-bold tracking-wide shadow-md shadow-[#4c7c4f]/10 transition-all transform active:scale-95 flex items-center justify-center gap-2 group cursor-pointer"
+                      >
+                        {isLogining ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-xs uppercase tracking-widest font-black">Syncing Agricultural ID...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <span>{t.loginBtn}</span>
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
+                      </button>
+
+                      {/* Guest login button */}
+                      <button
+                        type="button"
+                        disabled={isLogining}
+                        onClick={() => {
+                          setIsLogining(true);
+                          setTimeout(() => {
+                            const randomIds = ["Rama Swamy", "Appa Rao", "Venkat", "Kalyani", "Nageswara Rao", "Satyanarayana", "Laxmi"];
+                            const nameIdx = Math.floor(Math.random() * randomIds.length);
+                            const guestName = `${randomIds[nameIdx]} (Guest)`;
+                            const loggedUser = {
+                              name: guestName,
+                              mobile: "9999999999",
+                              pin: "0000",
+                              isLoggedIn: true
+                            };
+                            setUser(loggedUser);
+                            localStorage.setItem("soil_depictor_user", JSON.stringify(loggedUser));
+                            setIsLogining(false);
+                            setStep(1);
+                          }, 500);
+                        }}
+                        className="w-full bg-white border border-[#cfdfd0] text-[#345b36] hover:bg-emerald-50/20 py-3 px-6 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Sprout className="w-4 h-4 text-emerald-600" />
+                        <span>{t.guestLoginBtn}</span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+
               </div>
             </div>
           )}
